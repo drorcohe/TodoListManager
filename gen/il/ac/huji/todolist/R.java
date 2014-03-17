@@ -26,16 +26,22 @@ public final class R {
         public static final int ic_launcher=0x7f020002;
     }
     public static final class id {
+        public static final int btnCancel=0x7f080002;
+        public static final int btnOK=0x7f080003;
+        public static final int datePicker=0x7f080001;
         public static final int edtNewItem=0x7f080000;
-        public static final int lstTodoItems=0x7f080001;
-        public static final int menuItemAdd=0x7f080005;
-        public static final int menuItemDelete=0x7f080004;
-        public static final int rowLayout=0x7f080002;
-        public static final int rowText=0x7f080003;
+        public static final int lstTodoItems=0x7f080004;
+        public static final int menuItemAdd=0x7f08000a;
+        public static final int menuItemCall=0x7f080009;
+        public static final int menuItemDelete=0x7f080008;
+        public static final int rowLayout=0x7f080005;
+        public static final int txtTodoDueDate=0x7f080007;
+        public static final int txtTodoTitle=0x7f080006;
     }
     public static final class layout {
-        public static final int activity_main=0x7f030000;
-        public static final int row=0x7f030001;
+        public static final int activity_add=0x7f030000;
+        public static final int activity_main=0x7f030001;
+        public static final int row=0x7f030002;
     }
     public static final class menu {
         public static final int context_item_menu=0x7f070000;
@@ -44,7 +50,11 @@ public final class R {
     public static final class string {
         public static final int action_add_todo=0x7f050001;
         public static final int app_name=0x7f050000;
+        public static final int btnCancelText=0x7f050003;
+        public static final int btnOKText=0x7f050004;
+        public static final int menuAddTitle=0x7f050005;
         public static final int menuItemDelete=0x7f050002;
+        public static final int noDueDate=0x7f050006;
     }
     public static final class style {
         /** 

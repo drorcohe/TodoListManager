@@ -4,5 +4,8 @@
     <string name="app_name">TodoList</string>
     <string name="action_add_todo">Add</string>
     <string name="menuItemDelete">Delete Item</string>
-    
+    <string name="btnCancelText">Cancel</string>
+    <string name="btnOKText">OK</string>
+    <string name="menuAddTitle">Add New Item</string>
+    <string name="noDueDate">No due date</string>
 </resources>

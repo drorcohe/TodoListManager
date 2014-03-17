@@ -5,18 +5,11 @@
     android:layout_marginLeft="20dp"
     android:layout_marginRight="20dp">
     
-	<EditText
-    android:id="@+id/edtNewItem"
-    android:background="@android:drawable/edit_text"
-	android:textColor="@android:color/primary_text_light"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:inputType="textEmailAddress" />
 	
 	<ListView 
     android:id="@+id/lstTodoItems"
     android:layout_marginTop="10dp"
-    android:layout_width="wrap_content"
+    android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:background="@drawable/custom_border"
     android:divider="#00000000" /> 
