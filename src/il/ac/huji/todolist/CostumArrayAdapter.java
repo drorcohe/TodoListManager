@@ -16,38 +16,46 @@ import android.widget.TextView;
 
 public class CostumArrayAdapter extends ArrayAdapter<CostumArrayAdapter.Item>{
 	@SuppressLint("SimpleDateFormat")
-	private SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+	
 	private Context context;
 	
 	public static class Item{
-		private final String rep;
+		@SuppressLint("SimpleDateFormat")
+		private static SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+		private final String title;
 		private final Date date;
-		private boolean isCallItem = false;
-		private String phoneNumberStr = "";
 		public Item(String rep, Date date){
-			this.rep = rep;
+			this.title = rep;
 			this.date = date;
-			if(rep.toLowerCase().startsWith("call ")||rep.toLowerCase().startsWith("call\t")){
-				this.isCallItem = true;
-				this.phoneNumberStr = rep.split("\\s+")[1];
-			}
 			
 		}
 		
-		public boolean isCallItem(){
-			return this.isCallItem;
+		public static boolean isCallItem(Item item){
+			return (item.getTitle().toLowerCase().startsWith("call ")||item.title.toLowerCase().startsWith("call\t"));
 		}
 		
-		public String getPhoneNumberStr(){
-			return this.phoneNumberStr;
+		public static String getPhoneNumberStr(Item item){
+			return item.getTitle().split("\\s+")[1];
 		}
 		
-		public String getRep(){
-			return this.rep;
+		public String getTitle(){
+			return this.title;
 		}
 		
-		public Date getDate(){
+		public Date getDueDate(){
 			return this.date;
+		}
+		
+		public boolean isEqual(Item other){
+			return (this.getTitle().equals(other.getTitle()) && this.getDueDate().getTime()==other.getDueDate().getTime());
+		}
+		
+		public String getDueDateStr(){
+			 String dueDateStr = "no due date";
+			 if(this.date!=null){
+				 dueDateStr = dateFormat.format(this.getDueDate().getTime());
+			 }
+			 return dueDateStr;
 		}
 	}
 	
@@ -75,22 +83,21 @@ public class CostumArrayAdapter extends ArrayAdapter<CostumArrayAdapter.Item>{
 		 }
 		 
 		 TextView labelTv=(TextView)row.findViewById(R.id.txtTodoTitle);
-		 labelTv.setText(super.getItem(position).getRep());
-		 Date dueDate = super.getItem(position).getDate();
-		 String dueDateStr = context.getResources().getString(R.string.noDueDate);
-		 if(dueDate!=null){
-			 dueDateStr = dateFormat.format(super.getItem(position).getDate().getTime());
-		 }
+		 labelTv.setText(super.getItem(position).getTitle());
+		 Date dueDate = super.getItem(position).getDueDate();
+		 String dueDateStr = super.getItem(position).getDueDateStr();
 		 TextView dueDateTv=(TextView)row.findViewById(R.id.txtTodoDueDate);
 		 dueDateTv.setText(dueDateStr);
 		 
 		 if(dueDate!=null){
 			 Calendar yesterday = Calendar.getInstance();
-			 yesterday.add(Calendar.DAY_OF_YEAR, -1);
-			 
+			 yesterday.add(Calendar.DAY_OF_YEAR, -1); 
 			 if(dueDate.before(yesterday.getTime())){
 				 labelTv.setTextColor(Color.RED);
 				 dueDateTv.setTextColor(Color.RED);
+			 }else{
+				 labelTv.setTextColor(Color.BLACK);
+				 dueDateTv.setTextColor(Color.BLACK);
 			 }
 		 }
 

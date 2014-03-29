@@ -54,7 +54,6 @@ public final class R {
         public static final int btnOKText=0x7f050004;
         public static final int menuAddTitle=0x7f050005;
         public static final int menuItemDelete=0x7f050002;
-        public static final int noDueDate=0x7f050006;
     }
     public static final class style {
         /** 

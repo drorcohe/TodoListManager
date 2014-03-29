@@ -3,8 +3,8 @@ package il.ac.huji.todolist;
 import il.ac.huji.todolist.CostumArrayAdapter.Item;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -20,18 +20,23 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ListView;
 
+import com.parse.Parse;
+import com.parse.ParseObject;
+
 public class TodoListManagerActivity extends Activity {
 	static public CostumArrayAdapter adapter;
-	static public final ArrayList<Item> todoList = new ArrayList<Item>();
+	static public ArrayList<Item> todoList;
+	TodoDAL todoDal;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		
+		todoDal = new TodoDAL(getBaseContext());
 		final ListView listView =(ListView)findViewById(R.id.lstTodoItems);
 		registerForContextMenu(listView);
 
+		todoList = todoDal.all(TodoDAL.DB_TYPE.SQLITE);
 	    adapter = new CostumArrayAdapter(this,android.R.layout.simple_list_item_1, todoList);
 	    listView.setAdapter(adapter);
 	}
@@ -43,16 +48,16 @@ public class TodoListManagerActivity extends Activity {
 		ListView listView = (ListView)v;
 		AdapterView.AdapterContextMenuInfo adapterContextMenuInfo = (AdapterContextMenuInfo) menuInfo;
 		Item adapterItem = (Item)listView.getItemAtPosition(adapterContextMenuInfo.position);
-		menu.setHeaderTitle(adapterItem.getRep());  
+		menu.setHeaderTitle(adapterItem.getTitle());  
 		MenuInflater inflater = getMenuInflater();
 		
 		
 		inflater.inflate(R.menu.context_item_menu, menu);
 		
 		MenuItem callItem = menu.findItem(R.id.menuItemCall);
-		if(adapterItem.isCallItem()){
+		if(Item.isCallItem(adapterItem)){
 			callItem.setVisible(true);
-			callItem.setTitle(adapterItem.getRep());
+			callItem.setTitle(adapterItem.getTitle());
 		}
 		else{
 			callItem.setVisible(false);
@@ -61,15 +66,16 @@ public class TodoListManagerActivity extends Activity {
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
 		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-	    Item adapterItem = adapter.getItem(info.position);
+	    Item todoItem = adapter.getItem(info.position);
 	    
 	    if(item.getItemId()==R.id.menuItemCall){
-	    	Intent dial = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + adapterItem.getPhoneNumberStr())); 
+	    	Intent dial = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + Item.getPhoneNumberStr(todoItem))); 
 	    	startActivity(dial);
 	    }
 	    else if(item.getItemId()==R.id.menuItemDelete){
-		    todoList.remove(adapterItem);
+		    todoList.remove(todoItem);
 		    adapter.notifyDataSetChanged();
+		    todoDal.delete(todoItem);
 	    }
 
 		return true;
@@ -78,7 +84,6 @@ public class TodoListManagerActivity extends Activity {
 	static int ADD_ITEM_REQUEST_CODE = 1;
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		// TODO Auto-generated method stub
 		switch (item.getItemId()) {
 	        case R.id.menuItemAdd:
 	        	Intent intent = new Intent(this,AddNewTodoItemActivity.class);
@@ -102,9 +107,10 @@ public class TodoListManagerActivity extends Activity {
 				if((Boolean)data.getExtras().get("isValid")){
 					String title = (String) data.getExtras().get("title");
 					Date dueDate = (Date) data.getExtras().get("dueDate");
-				//	Calendar calendar = Calendar.getInstance();
-		    	    TodoListManagerActivity.todoList.add(new Item(title,dueDate));
+					Item addedTodoItem = new Item(title,dueDate);
+		    	    TodoListManagerActivity.todoList.add(addedTodoItem);
 		    	    TodoListManagerActivity.adapter.notifyDataSetChanged();
+		    	    todoDal.insert(addedTodoItem);
 				}
 			}
 		
