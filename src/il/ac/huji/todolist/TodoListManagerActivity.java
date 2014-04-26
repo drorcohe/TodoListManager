@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -28,6 +29,7 @@ public class TodoListManagerActivity extends Activity {
 	static public ArrayList<Item> todoList;
 	TodoDAL todoDal;
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -36,9 +38,11 @@ public class TodoListManagerActivity extends Activity {
 		final ListView listView =(ListView)findViewById(R.id.lstTodoItems);
 		registerForContextMenu(listView);
 
-		todoList = todoDal.all(TodoDAL.DB_TYPE.SQLITE);
+		todoList = new ArrayList<Item>();//todoDal.all(TodoDAL.DB_TYPE.SQLITE);
 	    adapter = new CostumArrayAdapter(this,android.R.layout.simple_list_item_1, todoList);
 	    listView.setAdapter(adapter);
+	    
+	    new LoadAllTodos(todoList,adapter,getBaseContext() ).execute();
 	}
 
 	

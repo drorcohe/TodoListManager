@@ -26,20 +26,34 @@ public class TodoDAL {
 	TodoDBHelper helper;
 	SQLiteDatabase db;
 
-
+	//whenever this parse is true, the parse server will be updated as well
+	private boolean UPDATE_PARSE = false;
+	
 	public TodoDAL(Context context) { 
 		this.context=context;
 		helper = new TodoDBHelper(context);
 		db = helper.getWritableDatabase();
 	}
+	
+	public void setUpdateParse(boolean newVal){
+		UPDATE_PARSE = newVal;
+	}
+	public boolean getUpdateParse(){
+		return UPDATE_PARSE;
+	}
+	
+	
+	
 
 	public boolean insert(Item todoItem) {
-		//parse
-		ParseObject parse = new ParseObject(TABLE_NAME);
-		parse.put(TITLE_COL, todoItem.getTitle());
-		parse.put(DUE_DATE_COL, todoItem.getDueDate().getTime());
-		parse.saveInBackground();
-
+		if(UPDATE_PARSE){
+			//parse
+			ParseObject parse = new ParseObject(TABLE_NAME);
+			parse.put(TITLE_COL, todoItem.getTitle());
+			parse.put(DUE_DATE_COL, todoItem.getDueDate().getTime());
+			parse.saveInBackground();
+		}
+		
 		//SQLite
 		ContentValues todoContentValue = new ContentValues();
 		todoContentValue.put(TITLE_COL, todoItem.getTitle());
@@ -49,25 +63,27 @@ public class TodoDAL {
 	}
 
 	public void delete(Item todoItem) {
-		ParseQuery<ParseObject> query = ParseQuery.getQuery(TABLE_NAME);
-		query.whereMatches(TITLE_COL, todoItem.getTitle());
-		query.whereEqualTo(DUE_DATE_COL, todoItem.getDueDate().getTime());
-		query.findInBackground(new FindCallback<ParseObject>() {
-			public void done(List<ParseObject> objects, ParseException e) {
-				if (e == null) {
-					//assumes that there is only one object with such name and date.
-					if(objects.size()==0){
-						Log.e("Parse", "failed to delete an item.");
-						return;
+		if(UPDATE_PARSE){
+			ParseQuery<ParseObject> query = ParseQuery.getQuery(TABLE_NAME);
+			query.whereMatches(TITLE_COL, todoItem.getTitle());
+			query.whereEqualTo(DUE_DATE_COL, todoItem.getDueDate().getTime());
+			query.findInBackground(new FindCallback<ParseObject>() {
+				public void done(List<ParseObject> objects, ParseException e) {
+					if (e == null) {
+						//assumes that there is only one object with such name and date.
+						if(objects.size()==0){
+							Log.e("Parse", "failed to delete an item.");
+							return;
+						}
+						ParseObject delRow = objects.get(0);
+						delRow.deleteEventually();
+					} else {
+						Log.e("Parse error", "failed to delete an item.");
 					}
-					ParseObject delRow = objects.get(0);
-					delRow.deleteEventually();
-				} else {
-					Log.e("Parse error", "failed to delete an item.");
 				}
-			}
-		});
-
+			});
+		}
+		
 		Cursor cursor =  db.query(TABLE_NAME, new String[] {ID_COL,TITLE_COL,DUE_DATE_COL},
 				TITLE_COL + "=?", new String[] { todoItem.getTitle() },
 				null, null, ID_COL + " desc");
@@ -119,6 +135,7 @@ public class TodoDAL {
 					Date dueDate = new Date(cursor.getLong(cursor.getColumnIndex(DUE_DATE_COL)));
 					Item newItem = new Item(title,dueDate);
 					ret.add(newItem);
+					
 				}while (cursor.moveToNext());
 
 			}
